@@ -11,6 +11,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.example.tecnoguardapp.core.NavigationWrapper
+import com.example.tecnoguardapp.ui.theme.TecnoGuardAppTheme
 import com.example.tecnoguardapp.utils.AuthViewModel
 import com.example.tecnoguardapp.utils.Constants.REDIRECT_URI
 
@@ -23,7 +24,9 @@ class MainActivity : ComponentActivity() {
         handleIntent(intent)
         enableEdgeToEdge()
         setContent {
-            NavigationWrapper()
+            TecnoGuardAppTheme {
+                NavigationWrapper()
+            }
         }
     }
 

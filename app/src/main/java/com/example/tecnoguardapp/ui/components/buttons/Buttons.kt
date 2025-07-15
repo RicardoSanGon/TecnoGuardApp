@@ -5,11 +5,14 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -23,47 +26,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.tecnoguardapp.ui.theme.BlueMain
-import com.example.tecnoguardapp.ui.theme.BlueThird
+import com.example.tecnoguardapp.ui.theme.ColorMain
 
 @Composable
 fun ButtonMain(
-    text: String,
-    containerColor: Color = BlueMain,
+    containerColor: Color = ColorMain,
     contentColor: Color = Color.White,
-    borderColor: Color = BlueThird,
-    action: () -> Unit
+    modifier: Modifier = Modifier.size(width = 240.dp, height = 51.dp),
+    roundedSize: Dp = 5.dp,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    action: () -> Unit,
+    content: @Composable (RowScope.() -> Unit)
 ) {
-    Box(
-        modifier = Modifier
-            .width(250.dp)
-            .height(50.dp)
+    Button(
+        onClick = action,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor
+        ),
+        modifier = modifier,
+        shape = RoundedCornerShape(roundedSize),
+        contentPadding = contentPadding
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .offset(x = 0.dp, y = 4.dp)
-                .background(
-                    color = Color.Black.copy(alpha = 0.25f),
-                    shape = RoundedCornerShape(5.dp)
-                )
-        )
-        Button(
-            onClick = action,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = containerColor,
-                contentColor = contentColor
-            ),
-            modifier = Modifier
-                .fillMaxSize()
-                .border(1.dp, borderColor, RoundedCornerShape(5.dp)),
-            shape = RoundedCornerShape(5.dp),
-            elevation = null // Desactiva la elevación interna
-        ) {
-            Text(text, fontSize = 20.sp)
-        }
+        content()
     }
 }
 
@@ -72,11 +60,13 @@ fun ButtonMain(
 @Composable
 fun ButtonPreview() {
     Column(
-        Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ButtonMain("Text button") { }
+    ){
+        ButtonMain(action = {}) {
+            Text("Iniciar sesion")
+        }
     }
 }
 

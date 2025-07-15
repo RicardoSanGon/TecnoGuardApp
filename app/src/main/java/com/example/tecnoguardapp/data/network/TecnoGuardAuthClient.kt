@@ -1,8 +1,12 @@
 package com.example.tecnoguardapp.data.network
 
 import com.example.tecnoguardapp.data.model.TokenResponse
+import com.example.tecnoguardapp.data.responses.UserResponse
+import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface TecnoGuardAuthClient {
@@ -15,4 +19,7 @@ interface TecnoGuardAuthClient {
         @Field("code") code: String,
         @Field("code_verifier") codeVerifier: String
     ): TokenResponse
+
+
+
 }
