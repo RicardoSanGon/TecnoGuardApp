@@ -4,9 +4,11 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tecnoguardapp.data.network.TecnoGuardApiClient
+import com.example.tecnoguardapp.data.network.TecnoGuardAuthApiClient
 import com.example.tecnoguardapp.data.network.TecnoGuardAuthClient
+import com.example.tecnoguardapp.utils.Constants.CLIENT_ID
 import com.example.tecnoguardapp.utils.Constants.CODE_VERIFIER
+import com.example.tecnoguardapp.utils.Constants.REDIRECT_URI
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +22,7 @@ class AuthViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val dataStoreManager: DataStoreManager,
     @Named("auth") private val authApi: TecnoGuardAuthClient,
-    @Named("api") private val apiClient: TecnoGuardApiClient
+    @Named("api") private val apiClient: TecnoGuardAuthApiClient
 ) : ViewModel() {
 
     private val _navigateToDashboard = MutableStateFlow(false)
@@ -30,8 +32,8 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val tokenResponse = authApi.getToken(
-                    clientId = "2",
-                    redirectUri = "tecnoguard://callback",
+                    clientId = CLIENT_ID,
+                    redirectUri = REDIRECT_URI,
                     code = code,
                     codeVerifier = CODE_VERIFIER!!
                 )

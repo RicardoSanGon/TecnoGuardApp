@@ -1,6 +1,6 @@
 package com.example.tecnoguardapp.di
 
-import com.example.tecnoguardapp.data.network.TecnoGuardApiClient
+import com.example.tecnoguardapp.data.network.TecnoGuardAuthApiClient
 import com.example.tecnoguardapp.data.network.TecnoGuardAuthClient
 import com.example.tecnoguardapp.utils.Constants.API
 import com.example.tecnoguardapp.utils.Constants.URL
@@ -42,7 +42,7 @@ object NetworkModule {
     @Provides
     @Singleton
     @Named("api")
-    fun provideApiService(@Named("api") retrofit: Retrofit): TecnoGuardApiClient {
-        return retrofit.create(TecnoGuardApiClient::class.java)
+    fun provideApiService(@Named("api") retrofit: Retrofit): TecnoGuardAuthApiClient {
+        return retrofit.create(TecnoGuardAuthApiClient::class.java)
     }
 }

@@ -7,9 +7,9 @@ import java.security.SecureRandom
 import androidx.core.net.toUri
 
 object Constants {
-    val CLIENT_ID = "2"
+    val CLIENT_ID = "1"
     val REDIRECT_URI = "tecnoguard://callback"
-    val URL = "http://192.168.100.47:8000/"
+    val URL = "http://192.168.100.47:8001/"
     val API = "${URL}api/v1/"
     var CODE_VERIFIER: String? = null
 

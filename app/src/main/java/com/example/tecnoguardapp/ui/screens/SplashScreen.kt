@@ -26,7 +26,7 @@ fun SplashScreen(navController: NavController, authViewModel: AuthViewModel = hi
     LaunchedEffect(Unit) {
         val isLoggedIn = authViewModel.getData()
         navController.navigate(
-            if (true) Dashboard.route else Login.route
+            if (isLoggedIn) Dashboard.route else Login.route
         ) {
             popUpTo(Splash.route) { inclusive = true }
         }

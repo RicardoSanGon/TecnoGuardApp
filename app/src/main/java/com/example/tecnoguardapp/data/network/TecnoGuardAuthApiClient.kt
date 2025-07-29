@@ -4,7 +4,7 @@ import com.example.tecnoguardapp.data.responses.UserResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
-interface TecnoGuardApiClient {
-    @GET("user")
+interface TecnoGuardAuthApiClient {
+    @GET("me")
     suspend fun getMyData(@Header("Authorization") token: String): Response<UserResponse>
 }
