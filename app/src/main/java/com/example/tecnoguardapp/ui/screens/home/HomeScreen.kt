@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,13 +29,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tecnoguardapp.R
 import com.example.tecnoguardapp.ui.components.buttons.ButtonMain
 import com.example.tecnoguardapp.ui.theme.CyanGreen
+import kotlinx.coroutines.launch
 
 @Preview(showBackground = true)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    homeViewModel: HomeViewModel = hiltViewModel()
+) {
+    val coroutine = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(30.dp))
@@ -64,7 +70,13 @@ fun HomeScreen() {
                 .padding(horizontal = 10.dp, vertical = 40.dp),
             verticalArrangement = Arrangement.spacedBy(27.dp)
         ) {
-            DoorsButtons()
+            DoorsButtons(
+                openCarDoorAction = {
+                    coroutine.launch {
+                        homeViewModel.openCarDoor()
+                    }
+                }
+            )
         }
         Spacer(Modifier.weight(1f))
         Box(
@@ -84,7 +96,9 @@ fun HomeScreen() {
 }
 
 @Composable
-private fun DoorsButtons() {
+private fun DoorsButtons(
+    openCarDoorAction : () -> Unit
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text("Puerta Peatonal", fontSize = 16.sp)
         Spacer(Modifier.weight(1f))
@@ -119,7 +133,7 @@ private fun DoorsButtons() {
         Text("Entrada Automovil", fontSize = 16.sp)
         Spacer(Modifier.weight(1f))
         ButtonMain(
-            action = {},
+            action = {openCarDoorAction()},
             containerColor = CyanGreen,
             modifier = Modifier.size(64.dp),
             contentPadding = PaddingValues(0.dp)

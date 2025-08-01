@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -78,7 +79,7 @@ fun Options() {
         R.drawable.home_icon to "Home",
         R.drawable.settings_icon to "Config."
     )
-    val selectedIndex = remember { mutableStateOf(1) }
+    val selectedIndex = remember { mutableIntStateOf(1) }
 
     Box(
         modifier = Modifier
@@ -95,7 +96,7 @@ fun Options() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             options.forEachIndexed { index, (icon, label) ->
-                val isSelected = selectedIndex.value == index
+                val isSelected = selectedIndex.intValue == index
                 val alphaAnim by animateFloatAsState(
                     targetValue = if (isSelected) 1f else 0.4f,
                     label = "alphaAnimation"
@@ -106,7 +107,7 @@ fun Options() {
                         .clickable(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() }
-                        ) { selectedIndex.value = index },
+                        ) { selectedIndex.intValue = index },
                     contentAlignment = Alignment.Center
                 ) {
                     DashboardOption {

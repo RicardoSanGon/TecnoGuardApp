@@ -1,4 +1,4 @@
-package com.example.tecnoguardapp.data.model
+package com.example.tecnoguardapp.data.responses
 
 import com.google.gson.annotations.SerializedName
 

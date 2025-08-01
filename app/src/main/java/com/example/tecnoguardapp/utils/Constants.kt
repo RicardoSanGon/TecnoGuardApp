@@ -9,8 +9,10 @@ import androidx.core.net.toUri
 object Constants {
     val CLIENT_ID = "1"
     val REDIRECT_URI = "tecnoguard://callback"
-    val URL = "http://192.168.100.47:8001/"
+    val URL = "http://192.168.252.157:8001/"
+    val BUSINESS_URL = "http://192.168.252.157:8000/"
     val API = "${URL}api/v1/"
+    val BUSINESS_API = "${BUSINESS_URL}api/v1/"
     var CODE_VERIFIER: String? = null
 
     fun generateCodeVerifier(): String {
