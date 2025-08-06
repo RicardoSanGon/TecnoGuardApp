@@ -15,4 +15,6 @@ val ColorSecond = Color(0xFF21C396)
 val CyanGreen = Color(0xFF38EBAF)
 val BackgroundColor = Color(0xFF8FCABB)
 
+val Yellow = Color(0xFFFFCC28)
+
 val InvertLogo = Color(0xFF131216)

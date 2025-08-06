@@ -46,15 +46,16 @@ import androidx.compose.ui.unit.sp
 import com.example.tecnoguardapp.R
 
 
-@Preview()
 @Composable
 fun MainInput(
+    value: String,
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
+    onValueChange: (String) -> Unit
 ) {
     TextField(
-        value = "",
-        onValueChange = {},
+        value = value,
+        onValueChange = {onValueChange(it)},
         shape = RoundedCornerShape(8.dp),
         modifier = modifier.border(1.dp, Color.Black, RoundedCornerShape(8.dp)),
         colors = TextFieldDefaults.colors(
@@ -113,7 +114,7 @@ fun SelectInput(
             DropdownMenuItem(
                 text = { Text("Automovil") },
                 onClick = {
-                    onItemSelected("Peatonal")
+                    onItemSelected("Automovil")
                     expanded = false
                 }
             )

@@ -73,7 +73,7 @@ fun HomeScreen(
             DoorsButtons(
                 openCarDoorAction = {
                     coroutine.launch {
-                        homeViewModel.openCarDoor()
+                        homeViewModel.openCarDoor(it)
                     }
                 }
             )
@@ -97,13 +97,13 @@ fun HomeScreen(
 
 @Composable
 private fun DoorsButtons(
-    openCarDoorAction : () -> Unit
+    openCarDoorAction : (String) -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text("Puerta Peatonal", fontSize = 16.sp)
         Spacer(Modifier.weight(1f))
         ButtonMain(
-            action = {},
+            action = {openCarDoorAction("P")},
             containerColor = CyanGreen,
             modifier = Modifier.size(64.dp),
             contentPadding = PaddingValues(0.dp)
@@ -133,7 +133,7 @@ private fun DoorsButtons(
         Text("Entrada Automovil", fontSize = 16.sp)
         Spacer(Modifier.weight(1f))
         ButtonMain(
-            action = {openCarDoorAction()},
+            action = {openCarDoorAction("A")},
             containerColor = CyanGreen,
             modifier = Modifier.size(64.dp),
             contentPadding = PaddingValues(0.dp)
@@ -163,7 +163,7 @@ private fun DoorsButtons(
         Text("Salida Automovil", fontSize = 16.sp)
         Spacer(Modifier.weight(1f))
         ButtonMain(
-            action = {},
+            action = {openCarDoorAction("S")},
             containerColor = CyanGreen,
             modifier = Modifier.size(64.dp),
             contentPadding = PaddingValues(0.dp)
