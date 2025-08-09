@@ -8,17 +8,17 @@ import java.security.SecureRandom
 
 object Constants {
 
-    val CLIENT_ID = "1" //DEV
 
-    //val CLIENT_ID = "2"  //PROD
+    //val CLIENT_ID = "1" //DEV
+    val CLIENT_ID = "2"  //PROD
     val REDIRECT_URI = "tecnoguard://callback"
 
-    val URL = "http://192.168.100.47:8001/"
-    //val URL = "https://auth.tecnoguard.site/"
+    //val URL = "http://192.168.100.47:8001/"
+    val URL = "https://auth.tecnoguard.site/"
 
-    val BUSINESS_URL = "http://192.168.100.47:8000/"
+    //val BUSINESS_URL = "http://192.168.100.47:8000/"
+    val BUSINESS_URL = "https://business.tecnoguard.site/"
 
-    //val BUSINESS_URL = "https://business.tecnoguard.site/"
     val API = "${URL}api/v1/"
     val BUSINESS_API = "${BUSINESS_URL}api/v1/"
     var CODE_VERIFIER: String? = null
@@ -60,7 +60,7 @@ object Constants {
             .build()
     }
 
-    fun resetCodeVerifier(){
+    fun resetCodeVerifier() {
         CODE_VERIFIER = null
     }
 

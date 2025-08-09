@@ -11,17 +11,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AccountViewModel @Inject constructor(
+    val loadingManager: LoadingManager,
     private val dataStoreManager: DataStoreManager,
-    val loadingManager: LoadingManager
-): ViewModel(){
+) : ViewModel() {
 
     private val _userData = MutableLiveData<UserData>()
     val userData: LiveData<UserData> = _userData
 
 
-    suspend fun getUserData(){
-        loadingManager.showLoading()
-        _userData.value =  dataStoreManager.getUserData()
-        loadingManager.hideLoading()
+    suspend fun getUserData() {
+        _userData.value = dataStoreManager.getUserData()
     }
 }

@@ -68,6 +68,9 @@ fun DashboardScreen(
     accountViewModel: AccountViewModel = hiltViewModel(),
     authViewModel: AuthViewModel
 ) {
+    LaunchedEffect(Unit) {
+        authViewModel.getUserData()
+    }
 
     val isLoadingTokens by tokensViewModel.loadingManager.isLoading.collectAsState()
     val isLoadingConfig by configurationViewModel.loadingManager.isLoading.collectAsState()

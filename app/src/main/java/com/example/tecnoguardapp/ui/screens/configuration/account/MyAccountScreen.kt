@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 
 
+private val loadingData = "Cargando..."
+
 @Composable
 fun MyAccountScreen(
     accountViewModel: AccountViewModel = hiltViewModel()
@@ -44,32 +46,32 @@ fun MyAccountScreen(
         Text(text = buildAnnotatedString {
             append("Nombre: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append(userData?.name ?: "No disponible")
+            append(userData?.name ?: loadingData)
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Rol: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append(userData?.role?.name ?: "No disponible")
+            append(userData?.role?.name ?: loadingData)
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Dirección: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append(userData?.direccion ?: "No disponible")
+            append(userData?.direccion ?: loadingData)
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Correo: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append(userData?.email ?: "No disponible")
+            append(userData?.email ?: loadingData)
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Contacto: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append(userData?.phone ?: "No disponible")
+            append(userData?.phone ?: loadingData)
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Cerrada asignada: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append(userData?.family_group?.cerrada?.group_name ?: "No disponible")
+            append(userData?.family_group?.cerrada?.group_name ?: "Sin asignar")
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Miembros maximos: ")

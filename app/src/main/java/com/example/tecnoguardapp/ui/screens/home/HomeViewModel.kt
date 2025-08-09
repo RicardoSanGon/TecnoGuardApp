@@ -3,6 +3,8 @@ package com.example.tecnoguardapp.ui.screens.home
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.tecnoguardapp.data.model.OpenDoor
 import com.example.tecnoguardapp.data.network.BusinessApiClient
@@ -19,7 +21,19 @@ class HomeViewModel @Inject constructor(
     private val dataStoreManager: DataStoreManager,
 ) : ViewModel() {
 
-    suspend fun openCarDoor(door: String) {
+    private val _cerradaName = MutableLiveData<String?>()
+    val cerradaName: LiveData<String?> = _cerradaName
+
+    suspend fun getCerradaName(){
+        try {
+            _cerradaName.value = dataStoreManager.getUserData()?.family_group?.cerrada?.group_name
+        }catch(e: Exception){
+            Log.e("CERRADA", e.message!!)
+            _cerradaName.value = null
+        }
+    }
+
+    suspend fun openDoor(door: String) {
         val doorData = OpenDoor(door)
         val token = dataStoreManager.getAccessToken()
         val request = businessApi.abrirPuerta("Bearer ${token}", doorData)

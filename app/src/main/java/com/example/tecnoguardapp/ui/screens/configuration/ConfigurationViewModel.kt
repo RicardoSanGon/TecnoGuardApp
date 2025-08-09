@@ -16,6 +16,7 @@ import com.example.tecnoguardapp.utils.DataStoreManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -91,6 +92,7 @@ class ConfigurationViewModel @Inject constructor(
                 _listMembers.value = request.body()?.data
                 loadingManager.hideLoading()
             }
+
         } catch (e: Exception) {
             Toast.makeText(context, "Error al obtener los miembros!", Toast.LENGTH_SHORT).show()
             loadingManager.hideLoading()
@@ -112,6 +114,22 @@ class ConfigurationViewModel @Inject constructor(
                 _newMemberEmail.value = ""
                 Toast.makeText(context, "Miembro agregado", Toast.LENGTH_SHORT).show()
                 obtenerMiembros()
+                loadingManager.hideLoading()
+            }
+            else{
+                val errorBody = request.errorBody()?.string()
+                val errorMessage = if (errorBody != null) {
+                    try {
+                        JSONObject(errorBody).getString("message")
+                    } catch (e: Exception) {
+                        "Error desconocido"
+                    }
+                } else {
+                    "Error desconocido"
+                }
+
+                Log.d("ADDMEMBER", "${request.errorBody()?.string()}")
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                 loadingManager.hideLoading()
             }
 
