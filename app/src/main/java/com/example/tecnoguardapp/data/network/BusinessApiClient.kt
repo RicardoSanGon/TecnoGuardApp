@@ -9,6 +9,7 @@ import com.example.tecnoguardapp.data.responses.Family_Members.get.Members
 import com.example.tecnoguardapp.data.responses.Family_Members.store.StoreMember
 import com.example.tecnoguardapp.data.responses.Tokens.get.GetTokens
 import com.example.tecnoguardapp.data.responses.Tokens.store.CreateTokenResponse
+import com.example.tecnoguardapp.data.responses.UserResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -18,6 +19,9 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface BusinessApiClient {
+    @GET("me")
+    suspend fun getMyData(@Header("Authorization") token: String): Response<UserResponse>
+
     @POST("puerta")
     suspend fun abrirPuerta(
         @Header("Authorization") token: String,

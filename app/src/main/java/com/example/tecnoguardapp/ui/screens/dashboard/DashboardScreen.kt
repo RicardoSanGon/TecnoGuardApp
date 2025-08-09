@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -43,6 +44,7 @@ import com.example.tecnoguardapp.ui.screens.LoadScreen
 import com.example.tecnoguardapp.ui.screens.camera.CameraScreen
 import com.example.tecnoguardapp.ui.screens.configuration.ConfigurationScreen
 import com.example.tecnoguardapp.ui.screens.configuration.ConfigurationViewModel
+import com.example.tecnoguardapp.ui.screens.configuration.account.AccountViewModel
 import com.example.tecnoguardapp.ui.screens.configuration.account.MyAccountScreen
 import com.example.tecnoguardapp.ui.screens.configuration.members.AddMemberModal
 import com.example.tecnoguardapp.ui.screens.configuration.members.DeleteMemberModal
@@ -54,6 +56,7 @@ import com.example.tecnoguardapp.ui.screens.tokens.TokensViewModel
 import com.example.tecnoguardapp.ui.theme.BackgroundColor
 import com.example.tecnoguardapp.ui.theme.ColorSecond
 import com.example.tecnoguardapp.ui.theme.Yellow
+import com.example.tecnoguardapp.utils.AuthViewModel
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -62,10 +65,13 @@ fun DashboardScreen(
     tokensViewModel: TokensViewModel = hiltViewModel(),
     dashboardViewModel: DashboardViewModel = hiltViewModel(),
     configurationViewModel: ConfigurationViewModel = hiltViewModel(),
+    accountViewModel: AccountViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel
 ) {
 
     val isLoadingTokens by tokensViewModel.loadingManager.isLoading.collectAsState()
     val isLoadingConfig by configurationViewModel.loadingManager.isLoading.collectAsState()
+    val isLoadingAccount by accountViewModel.loadingManager.isLoading.collectAsState()
 
     val coroutine = rememberCoroutineScope()
 
@@ -101,7 +107,13 @@ fun DashboardScreen(
                 1 -> HomeScreen()
                 2 -> ConfigurationScreen(
                     showAccountScreen = { dashboardViewModel.onScreenChange(4) },
-                    showAddMemberModal = { configurationViewModel.showAddMember() })
+                    showAddMemberModal = { configurationViewModel.showAddMember() },
+                    onLogOut = {
+                        coroutine.launch {
+                            authViewModel.logout()
+                        }
+                    }
+                )
 
                 3 -> {
                     CameraScreen()
@@ -186,7 +198,7 @@ fun DashboardScreen(
             onAcceptAction = { coroutine.launch { configurationViewModel.deleteMember() } }
         )
     }
-    if (isLoadingTokens || isLoadingConfig) {
+    if (isLoadingTokens || isLoadingConfig || isLoadingAccount) {
         LoadScreen()
     }
 }

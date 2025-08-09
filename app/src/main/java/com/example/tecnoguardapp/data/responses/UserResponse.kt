@@ -1,5 +1,6 @@
 package com.example.tecnoguardapp.data.responses
 
+import com.example.tecnoguardapp.data.responses.User.UserData
 import com.google.gson.annotations.SerializedName
 
 data class UserResponse(

@@ -9,19 +9,28 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 
-@Preview()
+
 @Composable
-fun MyAccountScreen() {
+fun MyAccountScreen(
+    accountViewModel: AccountViewModel = hiltViewModel()
+) {
+    val userData by accountViewModel.userData.observeAsState()
+    LaunchedEffect(Unit) {
+        accountViewModel.getUserData()
+    }
     Column(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(30.dp))
@@ -35,32 +44,32 @@ fun MyAccountScreen() {
         Text(text = buildAnnotatedString {
             append("Nombre: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append("Usuario Test")
+            append(userData?.name ?: "No disponible")
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Rol: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append("Rol Test")
+            append(userData?.role?.name ?: "No disponible")
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Dirección: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append("Direccion Test")
+            append(userData?.direccion ?: "No disponible")
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Correo: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append("usertest@test.com")
+            append(userData?.email ?: "No disponible")
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Contacto: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append("8888888888")
+            append(userData?.phone ?: "No disponible")
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Cerrada asignada: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append("Cerrada test")
+            append(userData?.family_group?.cerrada?.group_name ?: "No disponible")
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Miembros maximos: ")

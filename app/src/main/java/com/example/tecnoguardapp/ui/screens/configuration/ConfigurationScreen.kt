@@ -29,7 +29,8 @@ import com.example.tecnoguardapp.R
 @Composable
 fun ConfigurationScreen(
     showAccountScreen: (Int) -> Unit,
-    showAddMemberModal: () -> Unit
+    showAddMemberModal: () -> Unit,
+    onLogOut: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -109,7 +110,12 @@ fun ConfigurationScreen(
                 .height(2.dp)
                 .background(color = Color.Black.copy(0.7f))
         )
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = { onLogOut() })
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.logout_icon),
                 contentDescription = null,

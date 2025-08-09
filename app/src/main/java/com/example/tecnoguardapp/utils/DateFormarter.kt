@@ -8,6 +8,6 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 fun formateDate(date: String): String {
     val dateTime = ZonedDateTime.parse(date)
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")
     return dateTime.format(formatter).toString()
 }

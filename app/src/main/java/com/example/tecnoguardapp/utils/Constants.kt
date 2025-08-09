@@ -7,13 +7,15 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 
 object Constants {
+
     val CLIENT_ID = "1" //DEV
 
     //val CLIENT_ID = "2"  //PROD
     val REDIRECT_URI = "tecnoguard://callback"
-    val URL = "http://192.168.100.47:8001/"
 
+    val URL = "http://192.168.100.47:8001/"
     //val URL = "https://auth.tecnoguard.site/"
+
     val BUSINESS_URL = "http://192.168.100.47:8000/"
 
     //val BUSINESS_URL = "https://business.tecnoguard.site/"
@@ -56,6 +58,10 @@ object Constants {
             .appendQueryParameter("code_challenge", codeChallenge)
             .appendQueryParameter("code_challenge_method", "S256")
             .build()
+    }
+
+    fun resetCodeVerifier(){
+        CODE_VERIFIER = null
     }
 
 }
