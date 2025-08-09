@@ -8,14 +8,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LoadScreen() {
-    Box(Modifier
-        .fillMaxSize()
-        .background(color = Color.Black.copy(alpha = 0.3f))) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(color = Color.Black.copy(alpha = 0.3f))
+            .pointerInput(Unit) {}
+    ) {
         CircularProgressIndicator(Modifier.align(Alignment.Center))
     }
 }

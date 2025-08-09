@@ -10,11 +10,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.tecnoguardapp.data.model.Tokens.CreateToken
 import com.example.tecnoguardapp.data.network.BusinessApiClient
+import com.example.tecnoguardapp.data.responses.Tokens.get.TokensData
+import com.example.tecnoguardapp.ui.screens.LoadingManager
 import com.example.tecnoguardapp.utils.DataStoreManager
+import com.example.tecnoguardapp.utils.formateDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -22,7 +23,8 @@ import javax.inject.Named
 class TokensViewModel @Inject constructor(
     @Named("business") private val businessApiClient: BusinessApiClient,
     private val dataStoreManager: DataStoreManager,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    val loadingManager: LoadingManager
 ) : ViewModel() {
     private val _selectedOption = MutableLiveData<String>()
     val selectedOption: LiveData<String> = _selectedOption
@@ -38,8 +40,20 @@ class TokensViewModel @Inject constructor(
 
     private val _showModal = MutableLiveData<Boolean>()
     val showModal: LiveData<Boolean> = _showModal
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _isButtonEnabled = MutableLiveData<Boolean>()
+    val isButtonEnabled: LiveData<Boolean> = _isButtonEnabled
+
+    private val _showTable = MutableLiveData<Boolean>()
+    val showTable: LiveData<Boolean> = _showTable
+
+    private val _listTokens = MutableLiveData<List<TokensData>>()
+    val listTokens: LiveData<List<TokensData>> = _listTokens
+
+
+    fun closeTable() {
+        _showTable.value = false
+    }
 
     fun onOptionChange(value: String) {
         _selectedOption.value = value
@@ -47,6 +61,9 @@ class TokensViewModel @Inject constructor(
 
     fun onChangeTokenName(value: String) {
         _tokenName.value = value
+        _tokenName.value?.length?.let {
+            _isButtonEnabled.value = it > 5
+        }
     }
 
     fun closeModal() {
@@ -55,33 +72,58 @@ class TokensViewModel @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun createToken() {
-        _isLoading.value = true
-        if (_tokenName.value != null && _selectedOption.value != null) {
+        loadingManager.showLoading()
+        _isButtonEnabled.value = false
+        if (_tokenName.value != null && _selectedOption.value != null && _tokenName.value != "" && _selectedOption.value != "") {
             try {
                 val acceso = CreateToken(_tokenName.value!!, _selectedOption.value!!.lowercase())
                 val token = dataStoreManager.getAccessToken()
                 val request = businessApiClient.crearAcceso("Bearer $token", acceso)
                 if (request.isSuccessful) {
                     _tokenCode.value = request.body()?.data?.valor
-                    val dateTime = ZonedDateTime.parse(request.body()?.data?.fecha_expiracion)
-                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                    _expirationDate.value = dateTime.format(formatter).toString()
+                    _expirationDate.value = formateDate(request.body()?.data!!.fecha_expiracion)
+                    _tokenName.value = ""
+                    _selectedOption.value = ""
                     _showModal.value = true
-                    _isLoading.value = false
+                    loadingManager.hideLoading()
                 } else {
-                    _isLoading.value = false
+                    loadingManager.hideLoading()
                     val errorMsg = request.errorBody()?.string() ?: "Error desconocido"
                     Log.e("CrearToken", "Error: $errorMsg")
                     Toast.makeText(context, "Ocurrió un error: $errorMsg", Toast.LENGTH_SHORT)
                         .show()
                 }
             } catch (err: Exception) {
-                _isLoading.value = false
+                loadingManager.hideLoading()
+                Toast.makeText(context, "Error al crear el token!", Toast.LENGTH_SHORT).show()
                 Log.d("CrearToken", err.message!!)
             }
         } else {
-            _isLoading.value = false
+            loadingManager.hideLoading()
             Toast.makeText(context, "Llene los datos porfavor", Toast.LENGTH_SHORT).show()
         }
     }
+
+    suspend fun obtenerTokens() {
+        loadingManager.showLoading()
+        try {
+            val token = dataStoreManager.getAccessToken()
+            val request = businessApiClient.obtenerAccesos("Bearer $token")
+            if (request.isSuccessful) {
+                _listTokens.value = request.body()?.data
+                loadingManager.hideLoading()
+                if (_listTokens.value!!.isEmpty()) {
+                    Toast.makeText(context, "No hay tokens!", Toast.LENGTH_SHORT).show()
+                } else {
+                    _showTable.value = true
+                }
+            }
+        } catch (err: Exception) {
+            loadingManager.hideLoading()
+            _showTable.value = false
+            Toast.makeText(context, "Error al ver los datos!", Toast.LENGTH_SHORT).show()
+            Log.d("CrearToken", err.message!!)
+        }
+    }
+
 }

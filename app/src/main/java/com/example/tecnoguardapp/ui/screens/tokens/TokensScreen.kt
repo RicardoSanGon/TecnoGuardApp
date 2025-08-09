@@ -11,11 +11,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,19 +29,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tecnoguardapp.R
+import com.example.tecnoguardapp.data.responses.Tokens.get.TokensData
 import com.example.tecnoguardapp.ui.components.buttons.ButtonMain
 import com.example.tecnoguardapp.ui.components.inputs.MainInput
 import com.example.tecnoguardapp.ui.components.inputs.SelectInput
-import com.example.tecnoguardapp.ui.screens.LoadScreen
 import com.example.tecnoguardapp.ui.theme.CyanGreen
+import com.example.tecnoguardapp.utils.formateDate
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -47,6 +55,7 @@ fun TokensScreen(
 ) {
     val optionSelected by tokensViewModel.selectedOption.observeAsState("")
     val tokenName by tokensViewModel.tokenName.observeAsState("")
+    val isButtonEnabled by tokensViewModel.isButtonEnabled.observeAsState(false)
 
     val coroutine = rememberCoroutineScope()
     Column(
@@ -121,15 +130,20 @@ fun TokensScreen(
                     }
                 },
                 roundedSize = 20.dp,
-                modifier = Modifier.size(width = 240.dp, height = 45.dp)
+                modifier = Modifier.size(width = 240.dp, height = 45.dp),
+                isEnabled = isButtonEnabled
             ) {
                 Text(text = "Crear Acceso", color = Color.Black, fontSize = 20.sp)
             }
             ButtonMain(
-                action = {},
+                action = {
+                    coroutine.launch {
+                        tokensViewModel.obtenerTokens()
+                    }
+                },
                 roundedSize = 20.dp,
                 containerColor = CyanGreen,
-                modifier = Modifier.size(width = 240.dp, height = 45.dp)
+                modifier = Modifier.size(width = 240.dp, height = 45.dp),
             ) {
                 Text(text = "Ver Accesos creados", color = Color.Black, fontSize = 15.sp)
             }
@@ -148,7 +162,8 @@ fun ModalToken(
     Box(
         Modifier
             .fillMaxSize()
-            .background(color = Color.Black.copy(alpha = 0.5f)),
+            .background(color = Color.Black.copy(alpha = 0.5f))
+            .pointerInput(Unit) {} ,
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -177,6 +192,80 @@ fun ModalToken(
                 modifier = Modifier.size(width = 240.dp, height = 45.dp)
             ) {
                 Text(text = "Aceptar", color = Color.White, fontSize = 20.sp)
+            }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun TokensTable(listTokens: List<TokensData>?, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = Color.White,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 400.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text("Tabla de datos", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Cabecera
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    listOf("Nombre", "Codigo", "Fecha Exp", "Usado").forEach {
+                        Text(
+                            text = it,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                listTokens?.forEach { token ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            token.nombre,
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            fontSize = 12.sp
+                        )
+                        Text(
+                            token.valor,
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            fontSize = 12.sp
+                        )
+                        Text(
+                            formateDate(token.fecha_expiracion),
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            fontSize = 10.sp
+                        )
+                        Text(
+                            if (token.usos == 1) "No" else "Si",
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
-package com.example.tecnoguardapp.data.responses.Tokens
+package com.example.tecnoguardapp.data.responses.Tokens.get
 
-data class Data(
+data class TokensData(
     val created_at: String,
     val fecha_expiracion: String,
     val id: Int,

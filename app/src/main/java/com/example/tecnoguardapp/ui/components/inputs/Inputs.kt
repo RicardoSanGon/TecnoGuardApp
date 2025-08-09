@@ -50,6 +50,7 @@ import com.example.tecnoguardapp.R
 fun MainInput(
     value: String,
     modifier: Modifier = Modifier,
+    placeholder: @Composable (() -> Unit)? = null,
     icon: @Composable (() -> Unit)? = null,
     onValueChange: (String) -> Unit
 ) {
@@ -66,7 +67,8 @@ fun MainInput(
             focusedTextColor = Color.Black,
             unfocusedTextColor = Color.Black
         ),
-        leadingIcon = icon
+        leadingIcon = icon,
+        placeholder = placeholder
     )
 }
 

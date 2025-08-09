@@ -39,7 +39,9 @@ fun ButtonMain(
     roundedSize: Dp = 5.dp,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     action: () -> Unit,
-    content: @Composable (RowScope.() -> Unit)
+    isEnabled: Boolean = true,
+    content: @Composable (RowScope.() -> Unit),
+
 ) {
     Button(
         onClick = action,
@@ -49,7 +51,8 @@ fun ButtonMain(
         ),
         modifier = modifier,
         shape = RoundedCornerShape(roundedSize),
-        contentPadding = contentPadding
+        contentPadding = contentPadding,
+        enabled = isEnabled
     ) {
         content()
     }

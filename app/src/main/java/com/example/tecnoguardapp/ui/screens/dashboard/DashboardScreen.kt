@@ -23,18 +23,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,26 +41,49 @@ import com.example.tecnoguardapp.R
 import com.example.tecnoguardapp.ui.components.buttons.ButtonMain
 import com.example.tecnoguardapp.ui.screens.LoadScreen
 import com.example.tecnoguardapp.ui.screens.camera.CameraScreen
+import com.example.tecnoguardapp.ui.screens.configuration.ConfigurationScreen
+import com.example.tecnoguardapp.ui.screens.configuration.ConfigurationViewModel
+import com.example.tecnoguardapp.ui.screens.configuration.account.MyAccountScreen
+import com.example.tecnoguardapp.ui.screens.configuration.members.AddMemberModal
+import com.example.tecnoguardapp.ui.screens.configuration.members.DeleteMemberModal
 import com.example.tecnoguardapp.ui.screens.home.HomeScreen
 import com.example.tecnoguardapp.ui.screens.tokens.ModalToken
 import com.example.tecnoguardapp.ui.screens.tokens.TokensScreen
+import com.example.tecnoguardapp.ui.screens.tokens.TokensTable
 import com.example.tecnoguardapp.ui.screens.tokens.TokensViewModel
 import com.example.tecnoguardapp.ui.theme.BackgroundColor
 import com.example.tecnoguardapp.ui.theme.ColorSecond
 import com.example.tecnoguardapp.ui.theme.Yellow
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DashboardScreen(
-    tokensViewModel: TokensViewModel = hiltViewModel()
+    tokensViewModel: TokensViewModel = hiltViewModel(),
+    dashboardViewModel: DashboardViewModel = hiltViewModel(),
+    configurationViewModel: ConfigurationViewModel = hiltViewModel(),
 ) {
+
+    val isLoadingTokens by tokensViewModel.loadingManager.isLoading.collectAsState()
+    val isLoadingConfig by configurationViewModel.loadingManager.isLoading.collectAsState()
+
+    val coroutine = rememberCoroutineScope()
+
     val showModal by tokensViewModel.showModal.observeAsState(false)
-    val isLoading by tokensViewModel.isLoading.observeAsState(false)
 
     val tokenCode by tokensViewModel.tokenCode.observeAsState("")
     val expirationDate by tokensViewModel.expirationDate.observeAsState("")
+    val showTableTokens by tokensViewModel.showTable.observeAsState(false)
+    val lisTokens by tokensViewModel.listTokens.observeAsState()
 
-    val selectedIndex = remember { mutableIntStateOf(1) }
+    val selectedScreen by dashboardViewModel.selectedScreen.observeAsState(1)
+
+    val showAddMemberModal by configurationViewModel.showAddMemberModal.observeAsState(false)
+    val showDeleteMemberModal by configurationViewModel.showDeleteMemberModal.observeAsState(false)
+    val memberEmail by configurationViewModel.newMemberEmail.observeAsState("")
+    val listMembers by configurationViewModel.listMembers.observeAsState()
+    val memberSelected by configurationViewModel.selectedMember.observeAsState()
+    val isEnableAddMemberButton by configurationViewModel.enableAddMemberButton.observeAsState(false)
 
     Column(
         Modifier
@@ -74,10 +96,14 @@ fun DashboardScreen(
             modifier = Modifier.height(550.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            when (selectedIndex.intValue) {
+            when (selectedScreen) {
                 0 -> TokensScreen()
                 1 -> HomeScreen()
-                2 -> {
+                2 -> ConfigurationScreen(
+                    showAccountScreen = { dashboardViewModel.onScreenChange(4) },
+                    showAddMemberModal = { configurationViewModel.showAddMember() })
+
+                3 -> {
                     CameraScreen()
                     Spacer(Modifier.height(20.dp))
                     ButtonMain(
@@ -96,12 +122,16 @@ fun DashboardScreen(
                         Text("Tomar Foto", fontSize = 23.sp, color = Color.Black)
                     }
                 }
+
+                4 -> {
+                    MyAccountScreen()
+                }
             }
 
         }
         Spacer(Modifier.height(20.dp))
         ButtonMain(
-            action = {},
+            action = { dashboardViewModel.onScreenChange(3) },
             containerColor = ColorSecond,
             roundedSize = 20.dp,
             modifier = Modifier.size(width = 306.dp, height = 51.dp)
@@ -116,8 +146,8 @@ fun DashboardScreen(
         }
         Spacer(Modifier.height(40.dp))
         Options(
-            selectedIndex = selectedIndex.intValue,
-            onOptionSelected = { index -> selectedIndex.intValue = index }
+            selectedIndex = selectedScreen,
+            onOptionSelected = { dashboardViewModel.onScreenChange(it) }
         )
     }
 
@@ -127,7 +157,36 @@ fun DashboardScreen(
             acceso = tokenCode
         ) { tokensViewModel.closeModal() }
     }
-    if (isLoading) {
+
+
+    if (showTableTokens) {
+        TokensTable(lisTokens) {
+            tokensViewModel.closeTable()
+        }
+    }
+    if (showAddMemberModal) {
+        AddMemberModal(
+            onCancelAction = { configurationViewModel.closeAddMember() },
+            onDeleteAction = { configurationViewModel.showDeleteMember(it) },
+            memberEmail = memberEmail,
+            onAcceptAction = {
+                coroutine.launch {
+                    configurationViewModel.addMember()
+                }
+            },
+            onChangeEmail = { configurationViewModel.onChangeEmail(it) },
+            listMembers = listMembers,
+            isEnabledAcceptButton = isEnableAddMemberButton
+        )
+    }
+    if (showDeleteMemberModal) {
+        DeleteMemberModal(
+            onCancelAction = { configurationViewModel.closeDeleteMember() },
+            memberSelected = memberSelected,
+            onAcceptAction = { coroutine.launch { configurationViewModel.deleteMember() } }
+        )
+    }
+    if (isLoadingTokens || isLoadingConfig) {
         LoadScreen()
     }
 }

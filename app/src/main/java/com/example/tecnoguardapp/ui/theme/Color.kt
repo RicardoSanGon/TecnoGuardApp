@@ -18,3 +18,5 @@ val BackgroundColor = Color(0xFF8FCABB)
 val Yellow = Color(0xFFFFCC28)
 
 val InvertLogo = Color(0xFF131216)
+
+val Danger = Color(0xFFFF5C5C)
