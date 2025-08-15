@@ -58,8 +58,15 @@ dependencies {
     //MVVM
     implementation("androidx.compose.runtime:runtime-livedata:1.6.1")
 
+    //Navegacion y serializacion
     implementation("androidx.navigation:navigation-compose:2.8.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    //Ubicacion
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

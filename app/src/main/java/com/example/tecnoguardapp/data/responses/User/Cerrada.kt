@@ -8,5 +8,6 @@ data class Cerrada(
     val guard_id: Any,
     val id: Int,
     val jefe_cerrada_id: Int,
-    val updated_at: String
+    val updated_at: String,
+    val localidades_entradas: List<LocalidadesEntrada>
 )
