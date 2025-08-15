@@ -1,6 +1,5 @@
 package com.example.tecnoguardapp.ui.screens.configuration
 
-import android.R
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -13,6 +12,7 @@ import com.example.tecnoguardapp.data.network.BusinessApiClient
 import com.example.tecnoguardapp.data.responses.Family_Members.get.MemberData
 import com.example.tecnoguardapp.ui.screens.LoadingManager
 import com.example.tecnoguardapp.utils.DataStoreManager
+import com.example.tecnoguardapp.utils.ErrorManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -23,9 +23,9 @@ import javax.inject.Named
 
 @HiltViewModel
 class ConfigurationViewModel @Inject constructor(
-    private val dataStoreManager: DataStoreManager,
     @Named("business") private val businessApiClient: BusinessApiClient,
     val loadingManager: LoadingManager,
+    val errorManager: ErrorManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
     private val _showAddMemberModal = MutableLiveData<Boolean>()
@@ -86,10 +86,13 @@ class ConfigurationViewModel @Inject constructor(
     suspend fun obtenerMiembros() {
         loadingManager.showLoading()
         try {
-            val token = dataStoreManager.getAccessToken()
-            val request = businessApiClient.obtenerMiembros("Bearer $token")
+            val request = businessApiClient.obtenerMiembros()
             if (request.isSuccessful) {
                 _listMembers.value = request.body()?.data
+                loadingManager.hideLoading()
+            }
+            else{
+                errorManager.showModal()
                 loadingManager.hideLoading()
             }
 
@@ -103,10 +106,8 @@ class ConfigurationViewModel @Inject constructor(
     suspend fun addMember() {
         loadingManager.showLoading()
         try {
-            val token = dataStoreManager.getAccessToken()
             val request =
                 businessApiClient.agregarMiembro(
-                    "Bearer $token",
                     AddMember(_newMemberEmail.value!!)
                 )
             if (request.isSuccessful) {
@@ -117,22 +118,9 @@ class ConfigurationViewModel @Inject constructor(
                 loadingManager.hideLoading()
             }
             else{
-                val errorBody = request.errorBody()?.string()
-                val errorMessage = if (errorBody != null) {
-                    try {
-                        JSONObject(errorBody).getString("message")
-                    } catch (e: Exception) {
-                        "Error desconocido"
-                    }
-                } else {
-                    "Error desconocido"
-                }
-
-                Log.d("ADDMEMBER", "${request.errorBody()?.string()}")
-                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                errorManager.showModal()
                 loadingManager.hideLoading()
             }
-
         } catch (e: Exception) {
             loadingManager.hideLoading()
             Toast.makeText(context, "Error al añadir el miembro!", Toast.LENGTH_SHORT).show()
@@ -143,15 +131,18 @@ class ConfigurationViewModel @Inject constructor(
     suspend fun deleteMember() {
         loadingManager.showLoading()
         try {
-            val token = dataStoreManager.getAccessToken()
             val request =
-                businessApiClient.eliminarMiembro("Bearer $token", _selectedMember.value!!.id)
+                businessApiClient.eliminarMiembro(_selectedMember.value!!.id)
             if (request.isSuccessful) {
                 loadingManager.hideLoading()
                 Toast.makeText(context, "Miembro eliminado de la familia!", Toast.LENGTH_SHORT)
                     .show()
                 obtenerMiembros()
                 closeDeleteMember()
+            }
+            else{
+                errorManager.showModal()
+                loadingManager.hideLoading()
             }
         } catch (e: Exception) {
             loadingManager.hideLoading()

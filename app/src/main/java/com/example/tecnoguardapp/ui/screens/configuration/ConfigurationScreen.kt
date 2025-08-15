@@ -30,7 +30,9 @@ import com.example.tecnoguardapp.R
 fun ConfigurationScreen(
     showAccountScreen: (Int) -> Unit,
     showAddMemberModal: () -> Unit,
-    onLogOut: () -> Unit
+    onLogOut: () -> Unit,
+    isJefeFamilia: Boolean,
+    haveFamily: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -63,26 +65,28 @@ fun ConfigurationScreen(
                 modifier = Modifier.size(30.dp)
             )
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = {
-                    showAddMemberModal()
-                })
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.person_add_icon),
-                contentDescription = null,
-                modifier = Modifier.size(50.dp)
-            )
-            Text("Agregar miembro", fontSize = 18.sp)
-            Spacer(Modifier.weight(1f))
-            Icon(
-                painter = painterResource(id = R.drawable.arrow_icon_black),
-                contentDescription = null,
-                modifier = Modifier.size(30.dp)
-            )
+        if (haveFamily && isJefeFamilia) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = {
+                        showAddMemberModal()
+                    })
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.person_add_icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(50.dp)
+                )
+                Text("Agregar miembro", fontSize = 18.sp)
+                Spacer(Modifier.weight(1f))
+                Icon(
+                    painter = painterResource(id = R.drawable.arrow_icon_black),
+                    contentDescription = null,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
         }
         Spacer(
             Modifier

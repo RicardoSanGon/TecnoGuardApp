@@ -14,41 +14,36 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface BusinessApiClient {
     @GET("me")
-    suspend fun getMyData(@Header("Authorization") token: String): Response<UserResponse>
+    suspend fun getMyData(): Response<UserResponse>
 
     @POST("puerta")
     suspend fun abrirPuerta(
-        @Header("Authorization") token: String,
         @Body() data: OpenDoor
     ): Response<DoorResponse>
 
     @POST("jefe-familia/token")
     suspend fun crearAcceso(
-        @Header("Authorization") token: String,
         @Body() data: CreateToken
     ): Response<CreateTokenResponse>
 
     @GET("jefe-familia/tokens")
-    suspend fun obtenerAccesos(@Header("Authorization") token: String): Response<GetTokens>
+    suspend fun obtenerAccesos(): Response<GetTokens>
 
     @GET("jefe-familia/family-members")
-    suspend fun obtenerMiembros(@Header("Authorization") token: String): Response<Members>
+    suspend fun obtenerMiembros(): Response<Members>
 
     @POST("jefe-familia/family-members")
     suspend fun agregarMiembro(
-        @Header("Authorization") token: String,
         @Body() data: AddMember
     ): Response<StoreMember>
 
     @DELETE("jefe-familia/family-members/{id}")
     suspend fun eliminarMiembro(
-        @Header("Authorization") token: String,
         @Path("id") id: Int
     ): Response<DeletedMember>
 

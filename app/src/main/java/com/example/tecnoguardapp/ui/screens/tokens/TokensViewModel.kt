@@ -12,7 +12,7 @@ import com.example.tecnoguardapp.data.model.Tokens.CreateToken
 import com.example.tecnoguardapp.data.network.BusinessApiClient
 import com.example.tecnoguardapp.data.responses.Tokens.get.TokensData
 import com.example.tecnoguardapp.ui.screens.LoadingManager
-import com.example.tecnoguardapp.utils.DataStoreManager
+import com.example.tecnoguardapp.utils.ErrorManager
 import com.example.tecnoguardapp.utils.formateDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,9 +22,9 @@ import javax.inject.Named
 @HiltViewModel
 class TokensViewModel @Inject constructor(
     @Named("business") private val businessApiClient: BusinessApiClient,
-    private val dataStoreManager: DataStoreManager,
     @ApplicationContext private val context: Context,
-    val loadingManager: LoadingManager
+    val loadingManager: LoadingManager,
+    val errorManager: ErrorManager
 ) : ViewModel() {
     private val _selectedOption = MutableLiveData<String>()
     val selectedOption: LiveData<String> = _selectedOption
@@ -57,13 +57,17 @@ class TokensViewModel @Inject constructor(
 
     fun onOptionChange(value: String) {
         _selectedOption.value = value
+        enableButton()
     }
 
     fun onChangeTokenName(value: String) {
         _tokenName.value = value
-        _tokenName.value?.length?.let {
-            _isButtonEnabled.value = it > 5
-        }
+        enableButton()
+    }
+
+    private fun enableButton() {
+        _isButtonEnabled.value = _tokenName.value?.length!! > 5 &&
+            _tokenName.value != null && _selectedOption.value != null && _tokenName.value != "" && _selectedOption.value != ""
     }
 
     fun closeModal() {
@@ -73,13 +77,12 @@ class TokensViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun createToken() {
         loadingManager.showLoading()
-        _isButtonEnabled.value = false
         if (_tokenName.value != null && _selectedOption.value != null && _tokenName.value != "" && _selectedOption.value != "") {
             try {
                 val acceso = CreateToken(_tokenName.value!!, _selectedOption.value!!.lowercase())
-                val token = dataStoreManager.getAccessToken()
-                val request = businessApiClient.crearAcceso("Bearer $token", acceso)
+                val request = businessApiClient.crearAcceso(acceso)
                 if (request.isSuccessful) {
+                    _isButtonEnabled.value = false
                     _tokenCode.value = request.body()?.data?.valor
                     _expirationDate.value = formateDate(request.body()?.data!!.fecha_expiracion)
                     _tokenName.value = ""
@@ -88,10 +91,7 @@ class TokensViewModel @Inject constructor(
                     loadingManager.hideLoading()
                 } else {
                     loadingManager.hideLoading()
-                    val errorMsg = request.errorBody()?.string() ?: "Error desconocido"
-                    Log.e("CrearToken", "Error: $errorMsg")
-                    Toast.makeText(context, "Ocurrió un error: $errorMsg", Toast.LENGTH_SHORT)
-                        .show()
+                    errorManager.showModal()
                 }
             } catch (err: Exception) {
                 loadingManager.hideLoading()
@@ -107,8 +107,7 @@ class TokensViewModel @Inject constructor(
     suspend fun obtenerTokens() {
         loadingManager.showLoading()
         try {
-            val token = dataStoreManager.getAccessToken()
-            val request = businessApiClient.obtenerAccesos("Bearer $token")
+            val request = businessApiClient.obtenerAccesos()
             if (request.isSuccessful) {
                 _listTokens.value = request.body()?.data
                 loadingManager.hideLoading()
@@ -117,6 +116,9 @@ class TokensViewModel @Inject constructor(
                 } else {
                     _showTable.value = true
                 }
+            } else {
+                loadingManager.hideLoading()
+                errorManager.showModal()
             }
         } catch (err: Exception) {
             loadingManager.hideLoading()

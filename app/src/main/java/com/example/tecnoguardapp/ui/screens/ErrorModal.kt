@@ -18,10 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tecnoguardapp.R
@@ -29,13 +28,17 @@ import com.example.tecnoguardapp.ui.components.buttons.ButtonMain
 import com.example.tecnoguardapp.ui.theme.ColorSecond
 import com.example.tecnoguardapp.ui.theme.Danger
 
-@Preview(showBackground = true)
+
 @Composable
-fun ErrorModal() {
+fun ErrorModal(
+    errorMessage: String,
+    closeModal: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.Black.copy(alpha = 0.5f)),
+            .background(color = Color.Black.copy(alpha = 0.5f))
+            .pointerInput(Unit) { closeModal() },
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -66,7 +69,8 @@ fun ErrorModal() {
                     fontSize = 32.sp,
                 )
             }
-            Text("Mensaje de error con un texto largo para poder hacer pruebas de tamaño en el modal hecho",
+            Text(
+                errorMessage,
                 fontSize = 18.sp
             )
             ButtonMain(action = {}, roundedSize = 30.dp, containerColor = ColorSecond) {

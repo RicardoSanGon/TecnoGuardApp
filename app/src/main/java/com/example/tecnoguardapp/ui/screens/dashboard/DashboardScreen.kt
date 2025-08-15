@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tecnoguardapp.R
 import com.example.tecnoguardapp.ui.components.buttons.ButtonMain
+import com.example.tecnoguardapp.ui.screens.ErrorModal
+import com.example.tecnoguardapp.ui.screens.ErrorViewModel
 import com.example.tecnoguardapp.ui.screens.LoadScreen
 import com.example.tecnoguardapp.ui.screens.camera.CameraScreen
 import com.example.tecnoguardapp.ui.screens.configuration.ConfigurationScreen
@@ -55,7 +57,6 @@ import com.example.tecnoguardapp.ui.screens.tokens.TokensTable
 import com.example.tecnoguardapp.ui.screens.tokens.TokensViewModel
 import com.example.tecnoguardapp.ui.theme.BackgroundColor
 import com.example.tecnoguardapp.ui.theme.ColorSecond
-import com.example.tecnoguardapp.ui.theme.Yellow
 import com.example.tecnoguardapp.utils.AuthViewModel
 import kotlinx.coroutines.launch
 
@@ -66,17 +67,29 @@ fun DashboardScreen(
     dashboardViewModel: DashboardViewModel = hiltViewModel(),
     configurationViewModel: ConfigurationViewModel = hiltViewModel(),
     accountViewModel: AccountViewModel = hiltViewModel(),
+    errorViewModel: ErrorViewModel = hiltViewModel(),
     authViewModel: AuthViewModel
 ) {
+
     LaunchedEffect(Unit) {
-        authViewModel.getUserData()
+        accountViewModel.haveCerrada()
+        accountViewModel.haveFamily()
+        accountViewModel.isJefeFamilia()
     }
+
+    val coroutine = rememberCoroutineScope()
+
+    val haveCerrada by accountViewModel.haveCerrada.observeAsState(true)
+    val haveFamily by accountViewModel.haveFamily.observeAsState(false)
+    val isJefeFamilia by accountViewModel.isJefeFamilia.observeAsState(false)
+
+    val isAnError by errorViewModel.isAnError.collectAsState()
+    val errorMessage by errorViewModel.errorMessage.collectAsState()
 
     val isLoadingTokens by tokensViewModel.loadingManager.isLoading.collectAsState()
     val isLoadingConfig by configurationViewModel.loadingManager.isLoading.collectAsState()
     val isLoadingAccount by accountViewModel.loadingManager.isLoading.collectAsState()
 
-    val coroutine = rememberCoroutineScope()
 
     val showModal by tokensViewModel.showModal.observeAsState(false)
 
@@ -115,27 +128,13 @@ fun DashboardScreen(
                         coroutine.launch {
                             authViewModel.logout()
                         }
-                    }
+                    },
+                    isJefeFamilia = isJefeFamilia,
+                    haveFamily = haveFamily
                 )
 
                 3 -> {
                     CameraScreen()
-                    Spacer(Modifier.height(20.dp))
-                    ButtonMain(
-                        action = {},
-                        containerColor = Yellow,
-                        roundedSize = 20.dp,
-                        modifier = Modifier.size(width = 250.dp, height = 51.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.camera_icon),
-                            contentDescription = null,
-                            modifier = Modifier.size(30.dp),
-                            tint = Color.Black
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Text("Tomar Foto", fontSize = 23.sp, color = Color.Black)
-                    }
                 }
 
                 4 -> {
@@ -149,7 +148,8 @@ fun DashboardScreen(
             action = { dashboardViewModel.onScreenChange(3) },
             containerColor = ColorSecond,
             roundedSize = 20.dp,
-            modifier = Modifier.size(width = 306.dp, height = 51.dp)
+            modifier = Modifier.size(width = 306.dp, height = 51.dp),
+            isEnabled = haveCerrada && selectedScreen != 3
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.camera_icon),
@@ -162,7 +162,8 @@ fun DashboardScreen(
         Spacer(Modifier.height(40.dp))
         Options(
             selectedIndex = selectedScreen,
-            onOptionSelected = { dashboardViewModel.onScreenChange(it) }
+            onOptionSelected = { dashboardViewModel.onScreenChange(it) },
+            haveCerrada = haveCerrada
         )
     }
 
@@ -204,12 +205,16 @@ fun DashboardScreen(
     if (isLoadingTokens || isLoadingConfig || isLoadingAccount) {
         LoadScreen()
     }
+    if (isAnError) {
+        ErrorModal(errorMessage, closeModal = { errorViewModel.closeModal() })
+    }
 }
 
 @Composable
 fun Options(
     selectedIndex: Int,
-    onOptionSelected: (Int) -> Unit
+    onOptionSelected: (Int) -> Unit,
+    haveCerrada: Boolean
 ) {
     val options = listOf(
         R.drawable.key_icon to "Accesos",
@@ -238,12 +243,14 @@ fun Options(
                     label = "alphaAnimation"
                 )
                 val textColor = if (isSelected) Color.Black else Color.Gray
+                val isEnable = if (index == 0) haveCerrada else true
 
                 Box(
                     modifier = Modifier
                         .clickable(
                             indication = null,
-                            interactionSource = remember { MutableInteractionSource() }
+                            interactionSource = remember { MutableInteractionSource() },
+                            enabled = isEnable
                         ) { onOptionSelected(index) },
                     contentAlignment = Alignment.Center
                 ) {

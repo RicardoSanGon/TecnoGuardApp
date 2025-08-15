@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 
 private val loadingData = "Cargando..."
+private val withoutAddress = "Sin especificar."
 
 @Composable
 fun MyAccountScreen(
@@ -56,7 +57,7 @@ fun MyAccountScreen(
         Text(text = buildAnnotatedString {
             append("Dirección: ")
             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            append(userData?.direccion ?: loadingData)
+            append(userData?.direccion ?: withoutAddress)
         }, fontSize = 16.sp)
         Text(text = buildAnnotatedString {
             append("Correo: ")

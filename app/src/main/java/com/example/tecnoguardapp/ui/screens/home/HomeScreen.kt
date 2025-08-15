@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,8 +41,14 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
+
+    LaunchedEffect(Unit) {
+        homeViewModel.getCerradaName()
+    }
+
     val coroutine = rememberCoroutineScope()
     val nombreCerrada by homeViewModel.cerradaName.observeAsState()
+    val areButtonsEnabled by homeViewModel.areButtonsEnabled.observeAsState(true)
     Column(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(30.dp))
@@ -72,9 +79,10 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(27.dp)
         ) {
             DoorsButtons(
-                isCerradaAsigned = nombreCerrada != null,
+                isCerradaAsigned = nombreCerrada != null && areButtonsEnabled,
                 openCarDoorAction = {
                     coroutine.launch {
+                        homeViewModel.disableButtonsForSeconds(10)
                         homeViewModel.openDoor(it)
                     }
                 }
