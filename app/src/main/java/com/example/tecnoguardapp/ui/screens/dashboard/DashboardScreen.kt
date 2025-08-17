@@ -1,6 +1,9 @@
 package com.example.tecnoguardapp.ui.screens.dashboard
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateFloatAsState
@@ -34,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,6 +64,7 @@ import com.example.tecnoguardapp.ui.theme.ColorSecond
 import com.example.tecnoguardapp.utils.AuthViewModel
 import kotlinx.coroutines.launch
 
+@SuppressLint("QueryPermissionsNeeded")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DashboardScreen(
@@ -76,6 +81,7 @@ fun DashboardScreen(
         accountViewModel.haveFamily()
         accountViewModel.isJefeFamilia()
     }
+    val context = LocalContext.current
 
     val coroutine = rememberCoroutineScope()
 
@@ -130,7 +136,25 @@ fun DashboardScreen(
                         }
                     },
                     isJefeFamilia = isJefeFamilia,
-                    haveFamily = haveFamily
+                    haveFamily = haveFamily,
+                    giveHelp = {
+                        val gmailIntent = configurationViewModel.buildGmailIntent()
+                        val chooserTitle = "Enviar correo"
+
+                        try {
+                            context.startActivity(gmailIntent) // abrir Gmail directo
+                        } catch (_: android.content.ActivityNotFoundException) {
+                            // Plan B: cualquier cliente de correo disponible (sin usar resolveActivity)
+                            val chooser = Intent.createChooser(configurationViewModel.buildHelpIntent(), chooserTitle)
+                            try {
+                                context.startActivity(chooser)
+                            } catch (_: android.content.ActivityNotFoundException) {
+                                Toast.makeText(context, "No se encontre ninguna app de correo intalada.",
+                                    Toast.LENGTH_LONG).show()
+                                // Snackbar: "No se encontró ninguna app de correo instalada."
+                            }
+                        }
+                    }
                 )
 
                 3 -> {

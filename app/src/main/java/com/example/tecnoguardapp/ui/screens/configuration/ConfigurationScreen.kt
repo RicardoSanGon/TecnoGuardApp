@@ -32,7 +32,8 @@ fun ConfigurationScreen(
     showAddMemberModal: () -> Unit,
     onLogOut: () -> Unit,
     isJefeFamilia: Boolean,
-    haveFamily: Boolean
+    haveFamily: Boolean,
+    giveHelp: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -94,7 +95,7 @@ fun ConfigurationScreen(
                 .height(2.dp)
                 .background(color = Color.Black.copy(0.7f))
         )
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().clickable(onClick = { giveHelp() })) {
             Icon(
                 painter = painterResource(id = R.drawable.mail_icon),
                 contentDescription = null,

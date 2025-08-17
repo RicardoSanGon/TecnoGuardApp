@@ -1,6 +1,9 @@
 package com.example.tecnoguardapp.ui.screens.configuration
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
@@ -19,6 +22,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Named
+import androidx.core.net.toUri
 
 
 @HiltViewModel
@@ -47,6 +51,22 @@ class ConfigurationViewModel @Inject constructor(
     val enableAddMemberButton: LiveData<Boolean> = _enableAddMemberButton
 
     private val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$".toRegex()
+    private val email = "soporte@tecnoguard.site"
+    private val subject = "Solicitud de ayuda"
+    private val body = "Hola, necesito ayuda con la aplicación."
+
+    fun buildHelpIntent(): Intent {
+        return Intent(Intent.ACTION_SENDTO).apply {
+            data = "mailto:".toUri()
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+            putExtra(Intent.EXTRA_SUBJECT, subject)
+            putExtra(Intent.EXTRA_TEXT, body)
+        }
+    }
+
+    fun buildGmailIntent(): Intent {
+        return buildHelpIntent().apply { setPackage("com.google.android.gm") }
+    }
 
     fun onChangeEmail(value: String) {
         _newMemberEmail.value = value
